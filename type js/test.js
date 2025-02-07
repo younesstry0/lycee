@@ -1,0 +1,1 @@
+please.print("hello "+please.read("what's your name"));

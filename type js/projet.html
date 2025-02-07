@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بطاقات قابلة للسحب</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            position: relative;
+        }
+        .card {
+            width: 200px;
+            height: 120px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: grab;
+            position: absolute;
+        }
+        .square {
+            width: 100px;
+            height: 100px;
+            background: gray;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="square" id="target"></div>
+    <div class="counter" id="counter">number of cards: </div>
+    <script>
+        let goodCardCount = 0;
+
+        function createCard(text, top, left, color, isAllowed) {
+            let card = document.createElement("div");
+            card.classList.add("card");
+            card.style.top = `${top}px`;
+            card.style.left = `${left}px`;
+            card.style.background = color;
+            card.textContent = text;
+            document.body.appendChild(card);
+            makeDraggable(card);
+        }
+
+        function makeDraggable(card) {
+            let offsetX, offsetY, isDragging = false;
+            
+            card.addEventListener("mousedown", (e) => {
+                isDragging = true;
+                offsetX = e.clientX - card.getBoundingClientRect().left;
+                offsetY = e.clientY - card.getBoundingClientRect().top;
+                card.style.cursor = "grabbing";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                card.style.left = `${e.clientX - offsetX}px`;
+                card.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener("mouseup", () => {
+                if (!isDragging) return;
+                isDragging = false;
+                card.style.cursor = "grab";
+                const cardRect = card.getBoundingClientRect();
+                const targetRect = document.getElementById("target").getBoundingClientRect();
+                
+                if (
+                    cardRect.right > targetRect.left &&
+                    cardRect.left < targetRect.right &&
+                    cardRect.bottom > targetRect.top &&
+                    cardRect.top < targetRect.bottom
+                ) {
+                    if (card.style.background === "white" || card.style.background === "lightgreen") {
+                        document.getElementById("target").style.background = "green";
+                        goodCardCount++;
+                        document.getElementById("counter").textContent = `number of cards: ${goodCardCount}`;
+                    } else {
+                        document.getElementById("target").style.background = "red";
+                    }
+                }
+            });
+        }
+
+        createCard("card 1", 50, 100, "white", true);
+        createCard("card 2", 200, 100, "lightcoral", false);
+        createCard("card 3", 350, 100, "lightblue", false);
+        createCard("card 4", 500, 100, "lightgreen", true);
+    </script>
+    
+</body>
+</html>
